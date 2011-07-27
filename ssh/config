@@ -1,0 +1,11 @@
+Host github.com
+	User pradermecker
+	Hostname github.com
+	PreferredAuthentications publickey
+	IdentityFile ~/.ssh/cirb_rsa
+
+Host mygithub.com
+	User pradermecker
+	Hostname github.com
+	PreferredAuthentications publickey
+	IdentityFile ~/.ssh/id_rsa
