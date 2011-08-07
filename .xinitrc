@@ -16,8 +16,8 @@ fi
 vmware-user-suid-wrapper &
 xmodmap ~/.Xmodmap
 # xset b off
-#exec awesome
-exec xmonad
+exec awesome
+# exec xmonad
 # exec gnome-session
 # exec startkde
 # exec startxfce4

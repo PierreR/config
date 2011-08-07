@@ -14,7 +14,9 @@ compinit
 export GREP_OPTIONS='--exclude=\*.svn\*'
 export EDITOR=vim
 export TERM=xterm-256color
-export JDK_HOME=~/build/jdk1.7.0
+# export JDK_HOME=~/build/jdk1.7.0
+export JDK_HOME=/opt/java
+export JAVA_HOME=~/build/jdk1.6.0_26
 # export BMOB_DIR=~/projects/bmob
 # export MOZILLA_CERTIFICATE_FOLDER=~/.mozilla/firefox/djt0wc2v.default
 # export DJANGO_SETTINGS_MODULE='settings'
