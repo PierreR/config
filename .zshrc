@@ -5,7 +5,7 @@ zstyle :compinstall filename '/home/pierre/.zshrc'
 
 autoload -Uz compinit
 # setup a nice prompt
-source ~/build/zsh_prompt
+source ~/config/zsh_prompt
 # autoload -U colors && colors
 compinit
 # End of lines added by compinstall
