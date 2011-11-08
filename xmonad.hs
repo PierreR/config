@@ -12,6 +12,7 @@ import Data.Monoid
 import System.Exit
 
 import XMonad.Config.Azerty
+import XMonad.Hooks.DynamicLog
 
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
@@ -263,7 +264,13 @@ myStartupHook = return ()
 
 -- Run xmonad with the settings you specify. No need to modify this.
 --
-main = xmonad defaults {keys = \c -> azertyKeys c `M.union` keys defaults c }
+main = xmonad =<< statusBar cmd pp kb conf
+  where
+    cmd = "dzen2 -ta r"
+    -- cmd = "bash -c \\"tee >(xmobar -x0) \\""
+    pp = byorgeyPP
+    kb = toggleStrutsKey
+    conf = myConfig {keys = \c -> azertyKeys c `M.union` keys myConfig c }
 
 -- A structure containing your configuration settings, overriding
 -- fields in the default config. Any you don't override, will
@@ -271,7 +278,7 @@ main = xmonad defaults {keys = \c -> azertyKeys c `M.union` keys defaults c }
 --
 -- No need to modify this.
 --
-defaults = defaultConfig {
+myConfig = defaultConfig {
       -- simple stuff
         terminal           = myTerminal,
         focusFollowsMouse  = myFocusFollowsMouse,
@@ -293,3 +300,20 @@ defaults = defaultConfig {
         logHook            = myLogHook,
         startupHook        = myStartupHook
     }
+
+
+
+-- bar
+customPP = sjanssenPP { ppCurrent = dzenColor "#429942" "" . wrap "<" ">"
+                     , ppHidden = dzenColor "#C98F0A" ""
+                     , ppHiddenNoWindows = dzenColor "#C9A34E" ""
+                     , ppUrgent = dzenColor "#FFFFAF" "" . wrap "[" "]"
+                     , ppLayout = dzenColor "#C9A34E" ""
+                     , ppTitle = dzenColor "#C9A34E" "" . shorten 80
+                     , ppSep = dzenColor "#429942" "" " | "
+                     }
+
+
+-- keys
+toggleStrutsKey :: XConfig Layout -> (KeyMask, KeySym)
+toggleStrutsKey XConfig {XMonad.modMask = modMask} = (modMask, xK_b)
