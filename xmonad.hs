@@ -13,7 +13,8 @@ import System.Exit
 
 import XMonad.Config.Azerty
 import XMonad.Hooks.DynamicLog
-
+import XMonad.Hooks.ManageDocks
+import XMonad.Util.Run
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
 
@@ -247,7 +248,12 @@ myEventHook = mempty
 -- Perform an arbitrary action on each internal state change or X event.
 -- See the 'XMonad.Hooks.DynamicLog' extension for examples.
 --
-myLogHook = return ()
+myLogHook myStatusBar = dynamicLogWithPP xmobarPP  
+								 { ppCurrent = xmobarColor "white" "" . wrap "[" "]"
+								 , ppOutput = hPutStrLn myStatusBar  
+								 , ppTitle = xmobarColor "#2CE3FF" "" . shorten 50  
+								 , ppLayout = const "" -- to disable the layout info on xmobar  
+								 }  
 
 ------------------------------------------------------------------------
 -- Startup hook
@@ -264,56 +270,34 @@ myStartupHook = return ()
 
 -- Run xmonad with the settings you specify. No need to modify this.
 --
-main = xmonad =<< statusBar cmd pp kb conf
-  where
-    cmd = "dzen2 -ta r"
-    -- cmd = "bash -c \\"tee >(xmobar -x0) \\""
-    pp = byorgeyPP
-    kb = toggleStrutsKey
-    conf = myConfig {keys = \c -> azertyKeys c `M.union` keys myConfig c }
-
--- A structure containing your configuration settings, overriding
--- fields in the default config. Any you don't override, will
--- use the defaults defined in xmonad/XMonad/Config.hs
---
--- No need to modify this.
---
-myConfig = defaultConfig {
-      -- simple stuff
-        terminal           = myTerminal,
-        focusFollowsMouse  = myFocusFollowsMouse,
-        borderWidth        = myBorderWidth,
-        modMask            = myModMask,
-        numlockMask        = myNumlockMask,
-        workspaces         = myWorkspaces,
-        normalBorderColor  = myNormalBorderColor,
-        focusedBorderColor = myFocusedBorderColor,
-
-      -- key bindings
-        keys               = myKeys,
-        mouseBindings      = myMouseBindings,
-
-      -- hooks, layouts
-        layoutHook         = myLayout,
-        manageHook         = myManageHook,
-        handleEventHook    = myEventHook,
-        logHook            = myLogHook,
-        startupHook        = myStartupHook
-    }
+main = do
+  myStatusBar <- spawnPipe "xmobar"    
+  xmonad myConfig {
+	keys = \c -> azertyKeys c `M.union` keys myConfig c,
+	logHook = myLogHook myStatusBar
+  }
 
 
+myConfig  = defaultConfig { 
+  -- simple stuff
+  terminal           = myTerminal,
+  focusFollowsMouse  = myFocusFollowsMouse,
+  borderWidth        = myBorderWidth,
+  modMask            = myModMask,
+  numlockMask        = myNumlockMask,
+  workspaces         = myWorkspaces,
+  normalBorderColor  = myNormalBorderColor,
+  focusedBorderColor = myFocusedBorderColor,
 
--- bar
-customPP = sjanssenPP { ppCurrent = dzenColor "#429942" "" . wrap "<" ">"
-                     , ppHidden = dzenColor "#C98F0A" ""
-                     , ppHiddenNoWindows = dzenColor "#C9A34E" ""
-                     , ppUrgent = dzenColor "#FFFFAF" "" . wrap "[" "]"
-                     , ppLayout = dzenColor "#C9A34E" ""
-                     , ppTitle = dzenColor "#C9A34E" "" . shorten 80
-                     , ppSep = dzenColor "#429942" "" " | "
-                     }
+  -- key bindings
+  keys               = myKeys,
+  mouseBindings      = myMouseBindings,
+
+  -- hooks, layouts
+  layoutHook         = avoidStruts $ myLayout,
+  manageHook         = myManageHook,
+  handleEventHook    = myEventHook,
+  startupHook        = myStartupHook
+  }
 
 
--- keys
-toggleStrutsKey :: XConfig Layout -> (KeyMask, KeySym)
-toggleStrutsKey XConfig {XMonad.modMask = modMask} = (modMask, xK_b)
