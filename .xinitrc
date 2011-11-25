@@ -16,7 +16,8 @@ fi
 vmware-user-suid-wrapper &
 xmodmap ~/.Xmodmap
 # xset b off
-exec awesome
+exec scrotwm
+#exec awesome
 # exec xmonad
 # exec gnome-session
 # exec startkde
