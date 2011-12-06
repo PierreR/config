@@ -2,6 +2,7 @@
 
 zstyle ':completion:*' completer _complete _ignored
 zstyle :compinstall filename '/home/pi3r/.zshrc'
+zstyle ':completion:*:options' description 'yes'
 
 autoload -Uz compinit
 # setup a nice prompt
