@@ -13,7 +13,6 @@ inotifywait --exclude '[0-9]+' -mr --timefmt '%d/%m/%y %H:%M' --format '%T %w %f
 	
        # rsync -Cr --size-only --quiet --exclude="*.db" ~/projects/bmob/ bmob@192.168.64.128:src &> /dev/null && \
        rsync --quiet --relative -rae 'ssh -p 22' $FILECHANGEREL bmob@192.168.64.128:src &> /dev/null && \
-       #rsync --progress --relative -vrae 'ssh -p 22'  $FILECHANGEREL usernam@example.com:/backup/root/dir && \
        echo "At ${time} on ${date}, sync file $FILECHANGEREL"
 done
 popd
