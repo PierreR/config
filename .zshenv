@@ -3,8 +3,9 @@ export GREP_OPTIONS='--exclude=\*.svn\*'
 export EDITOR=vim
 export M2_REPO=~/.m2
 # export GOROOT=~/build/go
-# export GOBIN=$GOROOT/bin
 # export GOARCH=amd64
 # export GOOS=linux
-# path+=(~/bin $GOBIN)
-path+=(~/bin )
+export GOPATH=/home/xmod/golang
+export GOBIN=$GOPATH/bin
+# path+=(~/bin $GOBIN ~/projects/bmob/bin ~/.gem/ruby/1.9.1/bin)
+path+=(~/bin ~/projects/bmob/bin ~/.gem/ruby/1.9.1/bin)
