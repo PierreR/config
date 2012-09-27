@@ -65,7 +65,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     [ ((modm .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
 
     -- launch dmenu
-    , ((modm,               xK_p     ), spawn "exe=`dmenu_path | dmenu` && eval \"exec $exe\"")
+    , ((modm,               xK_p     ), spawn "exe=`dmenu_run | dmenu` && eval \"exec $exe\"")
 
     -- launch gvim
     , ((modm .|. shiftMask, xK_comma ), spawn "gvim")
@@ -214,7 +214,6 @@ myLayout = tiled ||| Mirror tiled ||| Full
 --
 myManageHook = composeAll
     [ className =? "MPlayer"        --> doFloat
-    , className =? "Gimp"           --> doFloat
     , resource  =? "desktop_window" --> doIgnore
     , resource  =? "kdesktop"       --> doIgnore ]
 
@@ -258,7 +257,7 @@ myStartupHook = setWMName "LG3D"
 -- Run xmonad with the settings you specify. No need to modify this.
 --
 main = do
-  myStatusBar <- spawnPipe "xmobar"    
+  myStatusBar <- spawnPipe "$HOME/.cabal/bin/xmobar"    
   xmonad myConfig {
 	keys = \c -> azertyKeys c `M.union` keys myConfig c,
 	logHook = myLogHook myStatusBar
