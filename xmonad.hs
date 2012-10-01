@@ -8,6 +8,7 @@
 --
 
 import XMonad
+import XMonad.Actions.GridSelect
 import Data.Monoid
 import System.Exit
 
@@ -65,10 +66,10 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     [ ((modm .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
 
     -- launch dmenu
-    , ((modm,               xK_p     ), spawn "exe=`dmenu_run | dmenu` && eval \"exec $exe\"")
+    , ((modm, xK_p), spawnSelected defaultGSConfig ["chromium","gvim"])
 
     -- launch gvim
-    , ((modm .|. shiftMask, xK_comma ), spawn "gvim")
+    , ((modm .|. shiftMask, xK_comma ), spawn "exec `emacsclient -c`")
 
     -- launch gmrun
     , ((modm .|. shiftMask, xK_p     ), spawn "gmrun")
@@ -234,12 +235,12 @@ myEventHook = mempty
 -- Perform an arbitrary action on each internal state change or X event.
 -- See the 'XMonad.Hooks.DynamicLog' extension for examples.
 --
-myLogHook myStatusBar = dynamicLogWithPP xmobarPP  
-								 { ppCurrent = xmobarColor "white" "" . wrap "[" "]"
-								 , ppOutput = hPutStrLn myStatusBar  
-								 , ppTitle = xmobarColor "#2CE3FF" "" . shorten 50  
-								 , ppLayout = const "" -- to disable the layout info on xmobar  
-								 }  
+myLogHook myStatusBar = dynamicLogWithPP xmobarPP
+                                                                 { ppCurrent = xmobarColor "white" "" . wrap "[" "]"
+                                                                 , ppOutput = hPutStrLn myStatusBar
+                                                                 , ppTitle = xmobarColor "#2CE3FF" "" . shorten 50
+                                                                 , ppLayout = const "" -- to disable the layout info on xmobar
+                                                                 }
 
 ------------------------------------------------------------------------
 -- Startup hook
@@ -257,14 +258,14 @@ myStartupHook = setWMName "LG3D"
 -- Run xmonad with the settings you specify. No need to modify this.
 --
 main = do
-  myStatusBar <- spawnPipe "$HOME/.cabal/bin/xmobar"    
+  myStatusBar <- spawnPipe "$HOME/.cabal/bin/xmobar"
   xmonad myConfig {
-	keys = \c -> azertyKeys c `M.union` keys myConfig c,
-	logHook = myLogHook myStatusBar
+        keys = \c -> azertyKeys c `M.union` keys myConfig c,
+        logHook = myLogHook myStatusBar
   }
 
 
-myConfig  = defaultConfig { 
+myConfig  = defaultConfig {
   -- simple stuff
   terminal           = myTerminal,
   focusFollowsMouse  = myFocusFollowsMouse,
@@ -284,5 +285,3 @@ myConfig  = defaultConfig {
   handleEventHook    = myEventHook,
   startupHook        = myStartupHook
   }
-
-
