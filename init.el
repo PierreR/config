@@ -1,14 +1,17 @@
 (require 'cl)
 (require 'package)
-(add-to-list 'package-archives
-             '("marmalade" . "http://marmalade-repo.org/packages/") t)
+(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+                        ("marmalade" . "http://marmalade-repo.org/packages/")
+                        ("melpa" . "http://melpa.milkbox.net/packages/")))
 (package-initialize)
 
 ;; required because of a package.el bug
 (setq url-http-attempt-keepalives nil)
 
 (defvar my-packages
-  '(ack-and-a-half
+  '(ac-nrepl
+    ack-and-a-half
+    auto-complete
     clojure-mode
     ido-ubiquitous
     nrepl
@@ -19,6 +22,7 @@
     smex
     undo-tree
     volatile-highlights
+    yaml-mode
     zenburn-theme))
 
 (defun my-packages-installed-p ()
@@ -36,28 +40,33 @@
       (unless (package-installed-p p)
         (package-install p)))))
 
-(my-install-packages)
+;(my-install-packages)
 
 ;; Evil
 (add-to-list 'load-path "~/.emacs.d/evil")
 (require 'evil)
 (evil-mode 1)
-(setq evil-normal-state-cursor '("grey" box))
-(setq evil-insert-state-cursor '("green" bar))
-(setq evil-motion-state-modes (append evil-emacs-state-modes evil-motion-state-modes))
-(setq evil-emacs-state-modes nil)
+(setq evil-move-cursor-back nil
+      evil-normal-state-cursor '("grey" box)
+      evil-insert-state-cursor '("green" bar)
+      evil-visual-state-cursor '("grey50")
+      ;; evil-motion-state-cursor '("grey50")
+      evil-emacs-state-modes nil)
+;; (setq evil-motion-state-modes (append evil-emVacs-state-modes evil-motion-state-modes)) 
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(blink-cursor-mode nil)
  '(custom-enabled-themes (quote (zenburn)))
  '(custom-safe-themes (quote ("71b172ea4aad108801421cc5251edb6c792f3adbaecfa1c52e94e3d99634dee7" default)))
  '(inhibit-startup-screen t)
+ '(menu-bar-mode nil)
  '(scroll-bar-mode nil)
- '(tool-bar-mode nil))
+ '(show-paren-mode t)
+ '(tool-bar-mode nil)
+ '(tooltip-mode nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -72,13 +81,19 @@
 ;; Recentf
 (setq recentf-max-saved-items 150
       recentf-max-menu-items 15)
+
 (defun recentf-ido-find-file ()
-  "Find a recent file using ido."
+  "Use ido to select a recently opened file"
   (interactive)
-  (let ((file (ido-completing-read "Choose recent file: " recentf-list nil t)))
-    (when file
-      (find-file file))))
-(global-set-key (kbd "C-c f") 'recentf-ido-find-file)
+  (let ((home (expand-file-name (getenv "HOME"))))
+    (find-file
+     (ido-completing-read "Recentf: "
+                          (mapcar (lambda (path)
+                                    (replace-regexp-in-string home "~" path))
+                                  recentf-list)
+                          nil t))))
+
+;(global-set-key (kbd "C-c f") 'recentf-ido-find-file)
 (recentf-mode t)
 
 (show-paren-mode +1)
@@ -94,15 +109,14 @@
 ;; Ido
 (setq ido-enable-flex-matching t
       ido-everywhere t
+      ido-enable-last-directory-history nil
+      ido-use-virtual-buffers nil
       ido-use-filename-at-point nil
       ido-max-prospects 8
-      ido-ignore-buffers
-       '("\\` " "^\\*"))
+      ido-ignore-buffers '("\\` " "^\\*"))
 
-;;(setq ido-ignore-buffers '("^\\s-" "^\\*" "TAGS$"))
 (ido-mode 1)
 (ido-ubiquitous 1)
-
 (setq ispell-program-name "aspell" ; use aspell instead of ispell
       ispell-extra-args '("--sug-mode=ultra"))
 
@@ -111,7 +125,7 @@
       `((".*" . ,temporary-file-directory)))
 (setq auto-save-file-name-transforms
       `((".*" ,temporary-file-directory t)))
-;(setq make-backup-files nil) 
+;(setq make-backup-files nil)
 
 (autoload 'puppet-mode "puppet-mode" "Major mode for editing puppet manifests")
 (add-to-list 'auto-mode-alist '("\\.pp$" . puppet-mode))
@@ -139,3 +153,14 @@
 (smex-initialize)
 ;(global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "C-,") 'smex)
+(global-set-key (kbd "C-x C-b") 'helm-mini)
+
+; Automatically delete trailing whitespace in puppet-mode
+(add-hook 'puppet-mode-hook (lambda () (add-to-list 'write-file-functions 'delete-trailing-whitespace)))
+
+; Auto-complete
+(require 'auto-complete-config)
+(ac-config-default)
+(add-to-list 'ac-dictionary-directories "~/.emacs.d/ac-dict")
+(setq ac-auto-start nil)
+(ac-set-trigger-key "TAB")
