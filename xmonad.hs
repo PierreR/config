@@ -1,10 +1,5 @@
 --
--- xmonad example config file.
---
--- A template showing all available configuration hooks,
--- and how to override the defaults in your own xmonad.hs conf file.
---
--- Normally, you'd only override those defaults you care about.
+-- xmonad config file.
 --
 
 import XMonad
@@ -19,47 +14,15 @@ import XMonad.Hooks.ManageDocks
 import XMonad.Util.Run
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
+import XMonad.Layout.ZoomRow
 
--- The preferred terminal program, which is used in a binding below and by
--- certain contrib modules.
---
-myTerminal      = "urxvt"
-
--- Whether focus follows the mouse pointer.
-myFocusFollowsMouse :: Bool
-myFocusFollowsMouse = True
-
--- Width of the window border in pixels.
---
-myBorderWidth   = 1
-
--- modMask lets you specify which modkey you want to use. The default
--- is mod1Mask ("left alt").  You may also consider using mod3Mask
--- ("right alt"), which does not conflict with emacs keybindings. The
--- "windows key" is usually mod4Mask.
---
-myModMask       = mod4Mask
+-- Some doc
+-- .|. is xmonad specific : it is a bitwise "or"
 
 
--- The default number of workspaces (virtual screens) and their names.
--- By default we use numeric strings, but any string may be used as a
--- workspace name. The number of workspaces is determined by the length
--- of this list.
---
--- A tagging example:
---
--- > workspaces = ["web", "irc", "code" ] ++ map show [4..9]
---
-myWorkspaces    = ["1","2","3","4","5","6","7","8","9"]
 
--- Border colors for unfocused and focused windows, respectively.
---
-myNormalBorderColor  = "#333333"
-myFocusedBorderColor = "#AFAF87"
-
-------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
---
+-- myKeys return a Map (associative list)
 myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- launch a terminal
@@ -68,7 +31,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- launch dmenu
     , ((modm, xK_p), spawnSelected defaultGSConfig ["chromium"])
 
-    -- launch gvim
+    -- launch emacs
     , ((modm .|. shiftMask, xK_comma ), spawn "exec `~/bin/subl`")
 
     -- launch gmrun
@@ -111,7 +74,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((modm,               xK_h     ), sendMessage Shrink)
 
     -- Expand the master area
-    , ((modm,               xK_l     ), sendMessage Expand)
+    , ((modm,               xK_m     ), sendMessage Expand)
 
     -- Push window back into tiling
     , ((modm,               xK_t     ), withFocused $ windows . W.sink)
@@ -143,15 +106,15 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     [((m .|. modm, k), windows $ f i)
         | (i, k) <- zip (XMonad.workspaces conf) [xK_1 .. xK_9]
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
-    ++
-
+-- ++
+    -- Xinerama not use within a vm
     --
     -- mod-{w,e,r}, Switch to physical/Xinerama screens 1, 2, or 3
     -- mod-shift-{w,e,r}, Move client to screen 1, 2, or 3
     --
-    [((m .|. modm, key), screenWorkspace sc >>= flip whenJust (windows . f))
-        | (key, sc) <- zip [xK_w, xK_e, xK_r] [0..]
-        , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
+    -- [((m .|. modm, key), screenWorkspace sc >>= flip whenJust (windows . f))
+    --     | (key, sc) <- zip [xK_w, xK_e, xK_r] [0..]
+    --     , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
 
 
 ------------------------------------------------------------------------
@@ -184,7 +147,7 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- The available layouts.  Note that each layout is separated by |||,
 -- which denotes layout choice.
 --
-myLayout = tiled ||| Mirror tiled ||| Full
+myLayout = Mirror tiled ||| Mirror zoomRow ||| zoomRow ||| Full ||| tiled
   where
      -- default tiling algorithm partitions the screen into two panes
      tiled   = Tall nmaster delta ratio
@@ -215,8 +178,7 @@ myLayout = tiled ||| Mirror tiled ||| Full
 --
 myManageHook = composeAll
     [ className =? "MPlayer"        --> doFloat
-    , resource  =? "desktop_window" --> doIgnore
-    , resource  =? "kdesktop"       --> doIgnore ]
+    , resource  =? "desktop_window" --> doIgnore ]
 
 ------------------------------------------------------------------------
 -- Event handling
@@ -258,7 +220,7 @@ myStartupHook = setWMName "LG3D"
 -- Run xmonad with the settings you specify. No need to modify this.
 --
 main = do
-  myStatusBar <- spawnPipe "$HOME/.cabal/bin/xmobar"
+  myStatusBar <- spawnPipe "xmobar"
   xmonad myConfig {
         keys = \c -> azertyKeys c `M.union` keys myConfig c,
         logHook = myLogHook myStatusBar
@@ -267,13 +229,13 @@ main = do
 
 myConfig  = defaultConfig {
   -- simple stuff
-  terminal           = myTerminal,
-  focusFollowsMouse  = myFocusFollowsMouse,
-  borderWidth        = myBorderWidth,
-  modMask            = myModMask,
-  workspaces         = myWorkspaces,
-  normalBorderColor  = myNormalBorderColor,
-  focusedBorderColor = myFocusedBorderColor,
+  terminal           = "lxterminal",
+  focusFollowsMouse  = False,
+  borderWidth        = 1,
+  modMask            = mod4Mask,
+  workspaces         = ["1","2","3","4","5","6","7","8","9"],
+  normalBorderColor  = "#333333",
+  focusedBorderColor = "#AFAF87",
 
   -- key bindings
   keys               = myKeys,
